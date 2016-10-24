@@ -59,11 +59,14 @@ dev:
 dist: bin
 	@echo "==> Tagging release (v${VERSION})..."
 ifdef GPG_KEY
-	@git commit --allow-empty --gpg-sign "${GPG_KEY}" -m "Release v${VERSION}"
+	@git commit --allow-empty --gpg-sign="${GPG_KEY}" -m "Release v${VERSION}"
 	@git tag -a -m "Version ${VERSION}" -s -u "${GPG_KEY}" "v${VERSION}" master
 else
 	@git commit --allow-empty -m "Release v${VERSION}"
 	@git tag -a -m "Version ${VERSION}" "v${VERSION}" master
 endif
-
+	@echo "--> Do not forget to run:"
+	@echo ""
+	@echo "    git push && git push --tags"
+	@echo ""
 .PHONY: bin deps dev
