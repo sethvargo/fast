@@ -11,9 +11,19 @@ if [ -z "$PROJECT" ]; then
   exit 127
 fi
 
+# Get the git commit information
+GIT_COMMIT="$(git rev-parse HEAD)"
+GIT_DIRTY="$(test -n "$(git status --porcelain)" && echo "+CHANGES" || true)"
+
 # Remove old builds
 rm -rf bin/*
 rm -rf pkg/*
+
+# Runtime variables
+LDFLAGS="-s -w"
+LDFLAGS="$LDFLAGS -X main.Name=${NAME}"
+LDFLAGS="$LDFLAGS -X main.Version=${VERSION}"
+LDFLAGS="$LDFLAGS -X main.GitCommit=${GIT_COMMIT}${GIT_DIRTY}"
 
 # Build!
 for GOOS in $XC_OS; do
@@ -32,7 +42,7 @@ for GOOS in $XC_OS; do
       GOARCH="${GOARCH}" \
       go build \
       -a \
-      -ldflags="-s -w" \
+      -ldflags="$LDFLAGS" \
       -o="pkg/${GOOS}_${GOARCH}/${NAME}" \
       .
   done

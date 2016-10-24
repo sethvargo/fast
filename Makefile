@@ -6,6 +6,8 @@ CURRENT_DIR := $(CURRENT_DIR:/=)
 # Get the project metadata
 VERSION := 0.1.1
 PROJECT := $(shell echo $(CURRENT_DIR) | rev | cut -d'/' -f1 -f2 -f3 | rev)
+OWNER := $(dir $(PROJECT))
+OWNER := $(notdir $(OWNER:/=))
 NAME := $(notdir $(PROJECT))
 
 # Current system information (this is the invoking system)
@@ -29,6 +31,7 @@ bin:
 		--rm \
 		--env="VERSION=${VERSION}" \
 		--env="PROJECT=${PROJECT}" \
+		--env="OWNER=${OWNER}" \
 		--env="NAME=${NAME}" \
 		--env="XC_OS=${XC_OS}" \
 		--env="XC_ARCH=${XC_ARCH}" \
@@ -37,7 +40,7 @@ bin:
 		--volume="${CURRENT_DIR}:/go/src/${PROJECT}" \
 		golang:1.7 /bin/sh -c "scripts/compile.sh"
 
-# deps
+# deps gets all the dependencies for this repository and vendors them.
 deps:
 	@echo "==> Updating dependencies..."
 	@echo "--> Installing dependency manager..."
@@ -80,14 +83,14 @@ docker:
 		--pull \
 		--rm \
 		--file="docker/Dockerfile" \
-		--tag="sethvargo/fast" \
-		--tag="sethvargo/fast:${VERSION}" \
+		--tag="${OWNER}/${NAME}" \
+		--tag="${OWNER}/${NAME}:${VERSION}" \
 		"${CURRENT_DIR}"
 
 # docker-push pushes the container to the registry
 docker-push:
 	@echo "==> Pushing to Docker registry..."
-	@docker push "sethvargo/fast:latest"
-	@docker push "sethvargo/fast:${VERSION}"
+	@docker push "${OWNER}/${NAME}:latest"
+	@docker push "${OWNER}/${NAME}:${VERSION}"
 
 .PHONY: bin deps dev dist docker docker-push
