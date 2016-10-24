@@ -56,12 +56,13 @@ dev:
 	@cp "${CURRENT_DIR}/pkg/${ME_OS}_${ME_ARCH}/${NAME}" "${CURRENT_DIR}/bin/"
 	@cp "${CURRENT_DIR}/pkg/${ME_OS}_${ME_ARCH}/${NAME}" "${GOPATH}/bin/"
 
+# dist builds the binaries and then signs and packages them for distribution
 dist: bin
 	@echo "==> Tagging release (v${VERSION})..."
 ifdef GPG_KEY
 	@git commit --allow-empty --gpg-sign="${GPG_KEY}" -m "Release v${VERSION}"
 	@git tag -a -m "Version ${VERSION}" -s -u "${GPG_KEY}" "v${VERSION}" master
-	@gpg --default-key "${GPG_KEY}" --detach-sig ./${NAME}_${VERSION}_SHA256SUMS
+	@gpg --default-key "${GPG_KEY}" --detach-sig "${CURRENT_DIR}/pkg/dist/${NAME}_${VERSION}_SHA256SUMS"
 else
 	@git commit --allow-empty -m "Release v${VERSION}"
 	@git tag -a -m "Version ${VERSION}" "v${VERSION}" master
@@ -71,4 +72,22 @@ endif
 	@echo "    git push && git push --tags"
 	@echo ""
 	@echo "And then upload the binaries in dist/ to GitHub!"
-.PHONY: bin deps dev
+
+# docker builds the docker container
+docker:
+	@echo "==> Building container..."
+	@docker build \
+		--pull \
+		--rm \
+		--file="docker/Dockerfile" \
+		--tag="sethvargo/fast" \
+		--tag="sethvargo/fast:${VERSION}" \
+		"${CURRENT_DIR}"
+
+# docker-push pushes the container to the registry
+docker-push:
+	@echo "==> Pushing to Docker registry..."
+	@docker push "sethvargo/fast:latest"
+	@docker push "sethvargo/fast:${VERSION}"
+
+.PHONY: bin deps dev dist docker docker-push
