@@ -69,4 +69,5 @@ endif
 	@echo ""
 	@echo "    git push && git push --tags"
 	@echo ""
+	@echo "And then upload the binaries in dist/ to GitHub!"
 .PHONY: bin deps dev
