@@ -61,6 +61,7 @@ dist: bin
 ifdef GPG_KEY
 	@git commit --allow-empty --gpg-sign="${GPG_KEY}" -m "Release v${VERSION}"
 	@git tag -a -m "Version ${VERSION}" -s -u "${GPG_KEY}" "v${VERSION}" master
+	@gpg --default-key "${GPG_KEY}" --detach-sig ./${NAME}_${VERSION}_SHA256SUMS
 else
 	@git commit --allow-empty -m "Release v${VERSION}"
 	@git tag -a -m "Version ${VERSION}" "v${VERSION}" master
