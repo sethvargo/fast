@@ -14,7 +14,7 @@ Speed: 170.98 Mbps
 1. Download from GitHub releases:
 
     ```shell
-    curl -sLo fast.tgz https://github.com/sethvargo/fast/releases/download/v0.1.0/fast_0.1.0_darwin_amd64.zip
+    curl -sLo fast.tgz https://github.com/sethvargo/fast/releases/download/v0.1.1/fast_0.1.1_darwin_amd64.tgz
     ```
 
 1. Untar:
